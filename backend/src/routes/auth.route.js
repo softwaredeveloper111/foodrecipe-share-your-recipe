@@ -1,5 +1,11 @@
 const express = require("express");
-const {registerUserController , loginUserController ,  logoutUserController} = require("../controllers/auth.controller")
+const {registerUserController ,
+   loginUserController ,  
+   logoutUserController , 
+    profileFetchController} = require("../controllers/auth.controller")
+const indentifyingUser = require("../middlewares/auth.middleware")
+
+
 
 
 
@@ -47,7 +53,24 @@ authRouter.post("/login", loginUserController)
    @description     loggedin user can sucessfully,  logout
 
 */
-authRouter.post("/logout", logoutUserController)
+authRouter.post("/logout", indentifyingUser ,logoutUserController)
+
+
+
+
+
+
+
+
+
+/**
+ * @method   GET
+ * @route     api/auth/me
+   @description     fetch your profile from database
+ */
+authRouter.get("/me" , indentifyingUser , profileFetchController )
+
+
 
 
 

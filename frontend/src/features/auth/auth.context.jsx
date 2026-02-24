@@ -1,6 +1,8 @@
 import React , {createContext, useState} from 'react'
-export const authContext = createContext()
 import { login, register  } from "./services/auth.api";
+
+
+export const authContext = createContext()
 
 
 
@@ -17,10 +19,16 @@ const  AuthContextProvider = ({children}) => {
 
     try {
     const response = await login(data);
-    setUser(response);
+
+    setUser(response.data);
+
+    return {success:true};
 
     } catch (error) {
-      console.log(error.message)
+      return {
+      success: false,
+      message: error.response?.data?.message || "Login failed",
+    };
     }
     finally{
       setLoading(false);
@@ -33,10 +41,13 @@ const  AuthContextProvider = ({children}) => {
     setLoading(true);
     try {
       const response = await register(data);
-      setUser(response);
-  
+      setUser(response.data);
+      return {success:true};
     } catch (error) {
-      console.log(error.message)
+      return {
+      success: false,
+      message: error.response?.data?.message || "Login failed",
+    };
     }
     finally{
       setLoading(false);

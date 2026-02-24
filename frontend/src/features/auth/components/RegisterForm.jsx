@@ -1,35 +1,73 @@
-import React from 'react'
+import React from "react";
 import { useForm } from "react-hook-form";
-import  useAuth  from "../hooks/useAuth";
+import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import Loading  from "./Loading";
+
 
 
 const RegisterForm = () => {
+  const { register, handleSubmit, reset } = useForm();
 
-  const {register,handleSubmit,reset} = useForm();
- 
-   const {handleRegister} = useAuth();
+  const navigate = useNavigate();
 
- async function submitHandler(data){
+  const { handleRegister , loading } = useAuth();
 
-  //  console.log(data);
-
-   
-   handleRegister(data);
-     
-    reset()
+  if(loading){
+    return <Loading/>
   }
 
 
-  return (
-    
-    <form className='flex flex-col gap-7 w-90 text-white' onSubmit={handleSubmit(submitHandler)}>
-      <input {...register("username")} className='px-3 py-2.5 bg-[#2E1E16] rounded-sm w-full border border-[#444242]  outline-none' type="text"  placeholder='username goes here  Ex.ChefMaster '/>
-      <input {...register("email")}  className='px-3 py-2.5 bg-[#2E1E16] rounded-sm w-full border border-[#444242]  outline-none' type="email"  placeholder='email goes here    Ex.chef@example.com'/>
-      <input {...register('password')}  className='px-3 py-2.5 bg-[#2E1E16] rounded-sm w-full border border-[#444242]  outline-none' type="password"  placeholder='password goes here'/>
-      <button className='bg-[#F46A25] rounded-md py-2.5 font-semibold cursor-pointer' type='submit'>Create Account</button>
-    </form>
-    
-  )
-}
+  async function submitHandler(data) {
+    try {
+      const result = await handleRegister(data);
+      if (result.success) {
+        reset();
+        toast.success(result.message);
+        navigate("/");
+      } else {
+        console.log(result.message);
+        toast.error(result.message);
+      }
+      reset();
+    } catch (error) {
+      console.log(error.message);
+      toast.error("something went wrong");
+    }
+  }
 
-export default RegisterForm
+  return (
+    <form
+      className="flex flex-col gap-7 w-90 text-white"
+      onSubmit={handleSubmit(submitHandler)}
+    >
+      <input
+        {...register("username")}
+        className="px-3 py-2.5 bg-[#2E1E16] rounded-sm w-full border border-[#444242]  outline-none"
+        type="text"
+        placeholder="username goes here  Ex.ChefMaster "
+      />
+      <input
+        {...register("email")}
+        className="px-3 py-2.5 bg-[#2E1E16] rounded-sm w-full border border-[#444242]  outline-none"
+        type="email"
+        placeholder="email goes here    Ex.chef@example.com"
+      />
+      <input
+        {...register("password")}
+        className="px-3 py-2.5 bg-[#2E1E16] rounded-sm w-full border border-[#444242]  outline-none"
+        type="password"
+        placeholder="password goes here"
+      />
+      <button
+        className="bg-[#F46A25] rounded-md py-2.5 font-semibold cursor-pointer"
+        type="submit"
+      >
+        Create Account
+      </button>
+    </form>
+  );
+};
+
+export default RegisterForm;

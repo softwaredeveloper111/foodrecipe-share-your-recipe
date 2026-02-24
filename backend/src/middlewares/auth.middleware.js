@@ -8,7 +8,12 @@ async function indentifyingUser(req,res,next){
 
   if(!token){
     return res.status(401).json({
-      message:"unthorized acess"
+      success:false,
+      message:"unthorized acess",
+      error:{
+        code:"UNAUTHORIZED",
+        details:null
+      }
     })
   }
 
@@ -21,7 +26,12 @@ async function indentifyingUser(req,res,next){
   } catch (error) {
 
     return res.status(401).json({
-      message:"unthorized acess"
+      success:false,
+      message:"unthorized acess",
+      error:{
+        code:"UNAUTHORIZED",
+        details:null
+      }
     })
     
   }
