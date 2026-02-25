@@ -10,7 +10,7 @@ export async function register(data){
 
   try {
      const response = await instance.post('/api/auth/register',data)
-      return response.data
+     return response.data
   } catch (error) {
     console.error(error.response?.data?.message || error.message)
     throw error;

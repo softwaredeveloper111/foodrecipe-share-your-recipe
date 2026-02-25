@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import Loading from "../components/Loading";
+import Loading from "../../shared/Loading";
 import { toast } from "react-toastify";
 
 

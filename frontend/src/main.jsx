@@ -4,16 +4,16 @@ import App from "./App.jsx";
 import "remixicon/fonts/remixicon.css";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import AuthContextProvider from "./features/auth/auth.context.jsx";
+import AuthContext  from "./features/auth/auth.context.jsx";
 
 
 
 
 createRoot(document.getElementById("root")).render(
-  <AuthContextProvider>
+  <AuthContext>
     <BrowserRouter>
       <App />
       <ToastContainer />
     </BrowserRouter>
-  </AuthContextProvider>,
+  </AuthContext>,
 );

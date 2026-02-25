@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Loading  from "./Loading";
+import Loading from "../../shared/Loading";
 
 
 
@@ -30,7 +30,7 @@ const RegisterForm = () => {
         console.log(result.message);
         toast.error(result.message);
       }
-      reset();
+
     } catch (error) {
       console.log(error.message);
       toast.error("something went wrong");
