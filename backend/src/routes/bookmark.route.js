@@ -18,27 +18,31 @@ const bookMarkRouter = express.Router();
 
 
 
+/**
+ * @method                POST
+ * @route                /api/recipes/:id/bookmark
+ * @description          save/bookmark your favourite recipe 
+ * @params               {req.params.id} = recipeId
+ */
+bookMarkRouter.post("/:id/bookmark" , indentifyingUser , addBookmarkController)
+
+
+
+
+
+
+
 
 /**
  * @method                GET
- * @route                /api/recipes/bookmark
+ * @route                /api/recipes/me/bookmark
  * @description          get your all save(bookmark) recipes
  * 
  */
-bookMarkRouter.get("/get" , indentifyingUser , getAllBookmarkController)
+bookMarkRouter.get("/me/bookmark" , indentifyingUser , getAllBookmarkController)
 
 
 
-
-
-
-/**
- * @method                POST
- * @route                /api/recipes/bookmark/:id
- * @description          save your favourite recipe 
- * @params               {req.params.id} = postId
- */
-bookMarkRouter.post("/:id" , indentifyingUser , addBookmarkController)
 
 
 
@@ -47,11 +51,11 @@ bookMarkRouter.post("/:id" , indentifyingUser , addBookmarkController)
 
 /**
  * @method                DELETE
- * @route                /api/recipes/bookmark/:id
- * @description          unsave your bookmark recipe 
- * @params               {req.params.id} = postId
+ * @route                /api/recipes/:id/bookmark
+ * @description          remove your bookmark from recipe 
+ * @params               {req.params.id} = recipeId
  */
-bookMarkRouter.delete("/:id" , indentifyingUser , removeBookmarkController)
+bookMarkRouter.delete("/:id/bookmark" , indentifyingUser , removeBookmarkController)
 
 
 

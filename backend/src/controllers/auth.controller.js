@@ -146,7 +146,7 @@ async function logoutUserController(req, res) {
     
    } catch (error) {
       return res.status(500).json({
-        message:"INTERNAL SERVER ERROR",
+        message:`INTERNAL SERVER ERROR ${error.message}`,
         success:false,
         error:{
           code:"INTERNAL SERVER ERROR",
@@ -192,7 +192,7 @@ async function profileFetchController(req, res) {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "INTERNAL SERVER ERROR",
+      message: `INTERNAL SERVER ERROR ${error.message}`,
       error: {
         code: "INTERNAL SERVER ERROR",
         details: null,

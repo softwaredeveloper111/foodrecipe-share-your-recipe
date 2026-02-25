@@ -29,11 +29,11 @@ app.use(cors({
 
 
 app.use("/api/auth",  authRouter);
+app.use("/api/users", userRouter) 
 app.use("/api/recipes",  recipeRouter )
-app.use("/api/recipes/user", userRouter) 
-app.use("/api/recipes/bookmark" , bookMarkRouter)
+app.use("/api/recipes" , likeRouter)
 app.use("/api/recipes/comment" , commentRouter);
-app.use("/api/recipes/like" , likeRouter)
+app.use("/api/recipes" , bookMarkRouter);
 
 
 

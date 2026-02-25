@@ -3,6 +3,7 @@ const indentifyingUser = require("../middlewares/auth.middleware")
 const {
      likeRecipePostController ,
    unlikeRecipePostController,
+   getLikedUsersListController
 } = require("../controllers/like.controller")
 
 
@@ -19,12 +20,12 @@ const likeRouter = express.Router();
 
 /**
  * @method        POST
- * @route      /api/user/like/:id
+ * @route      /api/recipes/:id/like
  * @description    user can like on post 
- * @params       {req.params.id} = postId
+ * @params       {req.params.id} = recipeId
  */
 
-likeRouter.post('/like/:id', indentifyingUser , likeRecipePostController)
+likeRouter.post('/:id/like', indentifyingUser , likeRecipePostController)
 
 
 
@@ -34,11 +35,35 @@ likeRouter.post('/like/:id', indentifyingUser , likeRecipePostController)
 
 /**
  *  @method            DELETE
- * @route              /api/user/unlike/:id
+ * @route              /api/recipes/:id/like
  * @description         liked user can only unlike  a  recipe post
- * @params              {req.params.id} = postId
+ * @params              {req.params.id} = recipeId
  */
-likeRouter.delete("/unlike/:id" , indentifyingUser , unlikeRecipePostController)
+likeRouter.delete("/:id/like" , indentifyingUser , unlikeRecipePostController)
+
+
+
+
+
+
+
+
+
+
+/** 
+ * @method            GET
+ * @route              /api/recipes/:id/likes
+ * @description         return list of liked users who are like on that recipe
+ * @params              {req.params.id} = recipeId
+ */
+likeRouter.get("/:id/likes" , indentifyingUser , getLikedUsersListController)
+
+
+
+
+
+
+
 
 
 

@@ -10,49 +10,71 @@ async function addBookmarkController(req,res){
 
   try {
     
-    const userId = req.user.id
+    const userId = req.user.id;
     const recipeId = req.params.id;
 
     const recipe = await recipeModel.findById(recipeId)
     if(!recipe){
       return res.status(404).json({
-        message:"recipe not found"
+        success:false,
+        message:"recipe not found",
+        error:{
+          code:"NOT FOUND",
+          details:{
+            message:"invalid recipeId or recipe not found in db"
+          }
+        }
       })
     }
 
 
     const isAlreayBookmarked = await favouriteModel.findOne({
       userId,
-      recipeId
+      recipeId,
     })
 
 
      if(isAlreayBookmarked ){
-      return res.status(400).json({
-        message:"you already bookmarked"
+      return res.status(409).json({
+        success:false,
+        message:"you have already bookmarked",
+        error:{
+           code:"CONFLICT",
+           details:{
+            message:"author can only bookmark once"
+           }
+        }
+
       })
      }
 
 
     const bookmark = await favouriteModel.create({
-       userId,
-      recipeId
+      userId,
+      recipeId,
     })
 
 
     res.status(201).json({
-      message:"post bookmared sucessfully",
-      bookmark
+      success:true,
+      message:"recipe bookmared sucessfully",
+      data: bookmark
     })
 
 
   } catch (error) {
-    return res.status(400).json({
-      message:`Bad request, ${error.message}`
+    return res.status(500).json({
+      success:false,
+      message:`INTERNAL SERVER ERROR, ${error.message}`,
+      error:{
+         code:"INTERNAL SERVER ERROR",
+         details:null
+      }
     })
   }
    
 }
+
 
 
 
@@ -68,7 +90,14 @@ async function removeBookmarkController(req,res){
     const recipe = await recipeModel.findById(recipeId)
     if(!recipe){
       return res.status(404).json({
-        message:"recipe not found"
+         success:false,
+        message:"recipe not found",
+        error:{
+          code:"NOT FOUND",
+          details:{
+            message:"invalid recipeId or recipe not found in db"
+          }
+        }
       })
     }
    
@@ -79,26 +108,43 @@ async function removeBookmarkController(req,res){
 
 
      if(!isBookmarked){
-      return res.status(400).json({
-        message:"you bookmarked first , for unsave"
+      return res.status(404).json({
+        success:false,
+        message:"No bookmark found of this recipe",
+        error:{
+          code:"NOT FOUND",
+          details:{
+            message:"before remove bookmark, you first have to bookmark it, and no bookmark found in this recipe"
+          }
+        }
       })
      }
 
 
      await favouriteModel.findByIdAndDelete(isBookmarked._id)
 
-     res.status(200).json({
-      message:"unbookmark sucessfully"
+     res.status(204).json({
+      success:true,
+      message:"revove bookmark sucessfully",
+    
      })
 
 
     
   } catch (error) {
-    return res.status(400).json({
-      message:`Bad request ${error.message}`
+    return res.status(500).json({
+      success:false,
+      message:`INTERNAL SERVER ERROR ${error.message}`,
+      error:{
+          code:"INTERNAL SERVER ERROR",
+          details:null
+      }
     })
   }
 }
+
+
+
 
 
 
@@ -111,18 +157,24 @@ async function getAllBookmarkController(req,res){
       
     const userId = req.user.id;
 
-    const bookMarkRecipe = await favouriteModel.find({userId}).populate("recipe")
+    const bookMarkRecipes = await favouriteModel.find({userId}).populate("recipeId")
     
   
     res.status(200).json({
+      success:true,
       message:"bookmark recipes fetch sucessfully",
-      bookMarkRecipe
+     data: bookMarkRecipes
     })
 
 
   } catch (error) {
-    return res.status(400).json({
-      message:`Bad request , ${error.message}`
+    return res.status(500).json({
+      success:false,
+      message:`INTERNAL SERVER ERROR , ${error.message}`,
+      error:{
+        code:"INTERNAL SERVER ERROR",
+        details:null
+      }
     })
   }
 }

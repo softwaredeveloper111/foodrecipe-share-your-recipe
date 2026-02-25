@@ -38,7 +38,7 @@ recipeRouter.post("/", identifyingUser  , upload.single("image") ,createRecipeCo
 /**
  * @method      GET
  * @route        /api/recipes/
- * @description   get all the recipes
+ * @description   get all the recipes show in feed
  */
 
 recipeRouter.get("/", identifyingUser  , getAllRecipesController)
@@ -57,7 +57,7 @@ recipeRouter.get("/", identifyingUser  , getAllRecipesController)
  * @method          GET
  * @route         /api/recipes/:id
  * @description    get a single receipe
- * @params        {req.body.params}
+ * @params        {req.body.params} = recipeId
  */
 
 recipeRouter.get("/:id" ,  identifyingUser , getSingleRecipeController)

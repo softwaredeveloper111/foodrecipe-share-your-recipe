@@ -6,6 +6,8 @@ const uploadToImageKit = require("../config/imageKit.config")
 
 
 
+
+
 /**create a new recipe , controller */
 
 async function createRecipeController(req,res){
@@ -38,18 +40,29 @@ async function createRecipeController(req,res){
 
 
   res.status(201).json({
+    sucess:true,
     message:"post created sucessfully",
-    createdPost
+    data: createdPost
   })
 
   
  } catch (error) {
-   return res.status(400).json({
-    message:"bad requrest"
+   return res.status(500).json({
+    success:false,
+    message:`INTERNAL SERVER ERROR , ${error.message}`,
+    error:{
+      code:"INTERNAL SERVER ERROR",
+      details:null
+    }
    })
  }
 
 }
+
+
+
+
+
 
 
 
@@ -62,25 +75,37 @@ async function getSingleRecipeController(req,res){
 
   const recipeId = req.params.id;
 
-  const recipe = await recipeModel.findById(recipeId);
+  const recipe = await recipeModel.findById(recipeId).populate("author");
 
   if(!recipe){
-     return res.status(404).josn({
-      messgae:"recipe not found"
+     return res.status(404).json({
+      success:false,
+      messgae:"recipe not found",
+      error:{
+        code:"NOT FOUND",
+        details:{
+          message:"invalid recipe id, recipie is not found"
+        }
+      }
      })
   }
 
 
   res.status(200).json({
     message:"receipe fetch sucessfully",
-    recipe
+    data: recipe
   })
 
 
   
  } catch (error) {
-  return res.status(400).json({
-    message:"invalid request"
+  return res.status(500).json({
+    success: false,
+    message:`INTERNAL SERVER ERROR, ${error.message}`,
+    error:{
+      code:"INTERNAL SERVER ERROR",
+      code:null
+    }
    })
  }
 }
@@ -90,17 +115,27 @@ async function getSingleRecipeController(req,res){
 
 
 
+
+
+
+
 /** get all recieps ,controller */
 async function  getAllRecipesController(req,res){
  try {
-  const recipes = await recipeModel.find().sort({createdAt:-1});
+  const recipes = await recipeModel.find().populate("author").sort({createdAt:-1});
   res.status(200).json({
+    success:true,
     message:"all recipes fetch sucessfully",
-    recipes
+    data: recipes
   })
  } catch (error) {
-  return res.status(400).json({
-    message:"bad request"
+  return res.status(500).json({
+    success:false,
+    message: `INTERNAL SERVER ERROR ${error.message}`,
+    error:{
+      code:"INTERNAL SERVER ERROR",
+      details:null
+    }
   })
  }
 }
@@ -124,13 +159,23 @@ async function updateRecipeController(req,res){
 
   if(!recipe){
     return res.status(404).json({
-       message:"recipe not found"
+      succes:false,
+       message:"recipe not found",
+      error:{
+        code:"NOT FOUND",
+        details:null
+      }
     })
   }
 
   if(recipe.author.toString() !== userId){
      return res.status(401).json({
-      message:"unthorized acess"
+      success:false,
+      message:"unthorized acess",
+      error:{
+        code:"UNTHORIZED",
+        details:"you are not authorized to perform the action"
+      }
      })
   }
    
@@ -148,20 +193,29 @@ async function updateRecipeController(req,res){
     if (req.body?.mealType) updateData.mealType = JSON.parse(req.body.mealType);
     if (response?.url) updateData.image = response.url;
 
-   await recipeModel.findByIdAndUpdate(recipeId ,updateData)
+   const result = await recipeModel.findByIdAndUpdate(recipeId ,updateData,{new:true})
 
   res.status(200).json({
-    message:"recipe updated sucessfully"
+    sucess:true,
+    message:"recipe updated sucessfully",
+    data: result ,
   })
     
   } catch (error) {
-    return res.status(400).json({
-      message:  `bad reqest ${error.message} `
+    return res.status(500).json({
+      success:false,
+      message:  `INTERNAL SERVER ERROR ${error.message} `,
+      error:{
+        code:"INTERNAL SERVER ERROR",
+        details:null
+      }
     })
   }
 
 
 }
+
+
 
 
 
@@ -180,19 +234,30 @@ async function deleteRecipeController(req,res){
   const recipe = await recipeModel.findById(recipeId)
   if (!recipe){
     return res.status(404).json({
-      message:"recipe not found"
+      success:false,
+      message:"recipe not found",
+      error:{
+        code:"NOT FOUND",
+        details:'invalid recipe id, recipe not found in db'
+      }
     })
   }
 
   if(recipe.author.toString() !== userId){
     return res.status(401).json({
-      message:"unthorized acess"
+      success:false,
+      message:"unthorized acess",
+      error:{
+        code:UNTHORIZED,
+        details:"you are not authorized to perfrom that action, only author do that"
+      }
     })
   }
 
   await recipeModel.findByIdAndDelete(recipeId)
 
-  res.status(200).json({
+  res.status(204).json({
+    success:true,
     message:"recipe delete sucessfully"
   })
 
@@ -200,8 +265,15 @@ async function deleteRecipeController(req,res){
 
   
  } catch (error) {
-   return res.status(400).json({
-    message:"bad request"
+   return res.status(500).json({
+    success:false,
+
+    message:`INTERNAL SERVER ERROR ${error.message}`,
+
+    error:{
+      code:"INTERNAL SERVER ERROR",
+      details:null
+    }
    })
  }
 

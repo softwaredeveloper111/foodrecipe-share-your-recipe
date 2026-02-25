@@ -4,7 +4,8 @@ const upload = require("../middlewares/multer.upload");
 const {
     commentRecipePostController,
      deleteCommentRecipePostController,
-     editCommentRecipePostController
+     editCommentRecipePostController,
+      getAllCommentsController
 } = require("../controllers/comment.controller")
 
 
@@ -20,11 +21,29 @@ const commentRouter = express.Router();
 
 /**
  * @method         POST
- * @route          /api/user/comment/:id
+ * @route          /api/recipes/comment/:id
  * @description    user can do comment on a post
- * @params         {req.params.id} = postId
+ * @params         {req.params.id} =  recipeId
  */
-commentRouter.post("/comment/:id", indentifyingUser ,upload.single() , commentRecipePostController)
+commentRouter.post("/:id", indentifyingUser ,upload.single() , commentRecipePostController)
+
+
+
+
+
+
+
+
+/**
+ * @method          GET
+ * @route           /api/recipes/comment/:id
+ * @description      fetch all the comments of that recipe post
+ * @params           {req.params.id} = recipeId
+ */
+commentRouter.get("/:id", indentifyingUser , getAllCommentsController)
+
+
+
 
 
 
@@ -34,11 +53,13 @@ commentRouter.post("/comment/:id", indentifyingUser ,upload.single() , commentRe
 
 /**
  * @method          DELETE
- * @route           /api/user/comment/delete/:id
- * @description     user can do delete their comment from a post
+ * @route           /api/recipes/comment/:id
+ * @description     user can do delete their own comment from a post -author only
  * @params          {req.params.id} = commentId
  */
-commentRouter.delete("/comment/delete/:id" , indentifyingUser ,  deleteCommentRecipePostController )
+commentRouter.delete("/:id" , indentifyingUser ,  deleteCommentRecipePostController )
+
+
 
 
 
@@ -49,11 +70,13 @@ commentRouter.delete("/comment/delete/:id" , indentifyingUser ,  deleteCommentRe
 
 /**
  * @method          PUT
- * @route           /api/user/comment/edit/:id
- * @description     user can edit their own comment 
+ * @route           /api/recipes/comment/:id
+ * @description     user can edit their own comment - author only
  * @params          {req.params.id} = commentId
  */
-commentRouter.put("/comment/edit/:id" , indentifyingUser , upload.single() ,editCommentRecipePostController )
+commentRouter.put("/:id" , indentifyingUser , upload.single() ,editCommentRecipePostController )
+
+
 
 
 

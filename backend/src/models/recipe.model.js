@@ -80,7 +80,18 @@ const recipeSchema = new mongoose.Schema({
     type:String,
     required:[true,"image should be required"]
   }
+  ,
 
+  likeCount:{
+    type:Number,
+    default:0
+  }
+  ,
+  
+  commentCount:{
+    type:Number,
+    default:0
+  }
 
    
 },{
