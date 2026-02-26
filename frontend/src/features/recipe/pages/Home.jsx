@@ -2,6 +2,10 @@ import React from 'react'
 import img1 from "../../../../public/assets/home-img-1.jpg"
 import PopurCategory from '../components/PopurCategory'
 import Trending from '../components/Trending'
+import RecentlyAdd from '../components/RecentlyAdd'
+import NewsLater from '../components/NewsLater'
+import PopularTags from '../components/PopularTags'
+import Footer from '../components/Footer'
 
 
 const Home = () => {
@@ -38,6 +42,14 @@ const Home = () => {
 
       <PopurCategory/>
       <Trending/>
+
+      <section className='flex justify-between mt-15'>
+        <RecentlyAdd/>
+        <NewsLater/>
+        <PopularTags/>
+      </section>
+
+      <Footer/>
 
     </div>
   )

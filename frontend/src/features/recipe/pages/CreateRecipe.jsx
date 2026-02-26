@@ -1,14 +1,14 @@
-import React, { useContext, useState } from 'react'
+import React, { useState }  from 'react'
 import { useForm } from "react-hook-form";
 import { nanoid } from 'nanoid'
-import { useNavigate } from 'react-router-dom';
+
 import { toast } from 'react-toastify';
 
 
 
 const CreateRecipe = () => {
 
-  const navigate = useNavigate()
+ 
 
   const [ingredientsDataList, setingredientsDataList] = useState([])
   const [singleIngrident,setSingleIngrident] = useState("")
@@ -53,7 +53,7 @@ const CreateRecipe = () => {
 
 
   return (
-    <div className='create-recipes'>
+    <div className='create-recipes p-10 bg-[#0F162A] text-white'>
 
 
        <form className='flex flex-col gap-5  w-100 ' onSubmit={handleSubmit(submitHandler)}>
@@ -167,7 +167,7 @@ const CreateRecipe = () => {
         </div> 
 
 
-        <button type='submit' className='px-3 py-2 bg-gray-900 rounded-md cursor-pointer w-fit mt-15'>create recipe</button>
+        <button type='submit' className='px-3 py-2 bg-gray-400 rounded-md cursor-pointer w-fit mt-15'>create recipe</button>
 
        </form>
     </div>

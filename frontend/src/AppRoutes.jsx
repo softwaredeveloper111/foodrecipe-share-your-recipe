@@ -7,6 +7,7 @@ import About from './features/recipe/pages/About';
 import RecipeDetails from './features/recipe/pages/RecipeDetails';
 import CreateRecipe from './features/recipe/pages/CreateRecipe';
 import Recipes from './features/recipe/pages/Recipes';
+import NotFound404 from './features/recipe/components/NotFound404';
 
 const AppRoutes = () => {
   return (
@@ -18,8 +19,10 @@ const AppRoutes = () => {
       <Route path='/'  element={<Home/>}/>
       <Route path='/about' element={<About/>}/>
       <Route path='/recipes' element={<Recipes/>}/>
-      <Route path='/recipe/details' element={<RecipeDetails/>}/>
+      <Route path='/recipe/details/' element={<RecipeDetails/>}/>
       <Route path='/recipe/create'  element={<CreateRecipe/>}   />
+      <Route path='*'  element={<NotFound404/>}   />
+
     </Routes>
 
     </>
