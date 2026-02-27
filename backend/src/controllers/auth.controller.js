@@ -37,8 +37,8 @@ async function registerUserController(req, res) {
       password: hashPassword,
     });
 
-    const token = jwt.sign({ id: createdUser._id }, process.env.JWT_SECRET);
-    res.cookie("JWT_TOKEN", token);
+    const token = jwt.sign({ id: createdUser._id }, process.env.JWT_SECRET,{expiresIn:"1d"});
+    res.cookie("JWT_TOKEN", token );
 
     const userObj = createdUser.toObject();
     delete userObj.password;
@@ -103,7 +103,7 @@ async function loginUserController(req, res) {
     });
   }
 
-  const token = jwt.sign({ id: registerUser._id }, process.env.JWT_SECRET);
+  const token = jwt.sign({ id: registerUser._id }, process.env.JWT_SECRET , {expiresIn:"1d"});
   res.cookie("JWT_TOKEN", token);
   
 

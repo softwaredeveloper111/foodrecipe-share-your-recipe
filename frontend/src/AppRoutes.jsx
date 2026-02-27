@@ -7,7 +7,11 @@ import About from './features/recipe/pages/About';
 import RecipeDetails from './features/recipe/pages/RecipeDetails';
 import CreateRecipe from './features/recipe/pages/CreateRecipe';
 import Recipes from './features/recipe/pages/Recipes';
-import NotFound404 from './features/recipe/components/NotFound404';
+import NotFound404 from './features/shared/NotFound404';
+import ProtectedRouter from "../src/utils/ProtectedRoute";
+
+
+
 
 const AppRoutes = () => {
   return (
@@ -16,11 +20,13 @@ const AppRoutes = () => {
     <Routes>
       <Route path='/login'  element={<Login/>}/>
       <Route path='/register' element={<Register/>}/>
-      <Route path='/'  element={<Home/>}/>
-      <Route path='/about' element={<About/>}/>
-      <Route path='/recipes' element={<Recipes/>}/>
-      <Route path='/recipe/details/' element={<RecipeDetails/>}/>
-      <Route path='/recipe/create'  element={<CreateRecipe/>}   />
+
+      <Route path='/'  element={<ProtectedRouter><Home/></ProtectedRouter>}/>
+
+      <Route path='/about' element={<ProtectedRouter><About/></ProtectedRouter>}/>
+      <Route path='/recipes' element={<ProtectedRouter><Recipes/></ProtectedRouter>}/>
+      <Route path='/recipe/details/:id' element={<ProtectedRouter><RecipeDetails/></ProtectedRouter>}/>
+      <Route path='/recipe/create'  element={<ProtectedRouter><CreateRecipe/></ProtectedRouter>}   />
       <Route path='*'  element={<NotFound404/>}   />
 
     </Routes>

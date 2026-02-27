@@ -5,15 +5,18 @@ import "remixicon/fonts/remixicon.css";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import AuthContext  from "./features/auth/auth.context.jsx";
+import RecipeContext from "./features/recipe/Recipe.context.jsx";
 
 
 
 
 createRoot(document.getElementById("root")).render(
+<RecipeContext>
   <AuthContext>
     <BrowserRouter>
       <App />
       <ToastContainer />
     </BrowserRouter>
-  </AuthContext>,
+  </AuthContext>
+</RecipeContext>
 );
