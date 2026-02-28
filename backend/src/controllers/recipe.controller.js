@@ -14,9 +14,11 @@ async function createRecipeController(req,res){
   
  try {
 
-   const userId = req.user.id;
+  const userId = req.user.id;
 
   const response = await  uploadToImageKit(req.file)
+
+
 
 
   const recipeData =  {
@@ -24,7 +26,7 @@ async function createRecipeController(req,res){
     description : req.body.description,
     ingredients : JSON.parse(req.body.ingredients),
     instructions:JSON.parse(req.body.instructions),
-    prepTimeMinutes : Number(req.body.prepTimeMinute),
+    prepTimeMinutes : Number(req.body.prepTimeMinutes),
     cookTimeMinutes: Number(req.body.cookTimeMinutes ),
     servings : Number(req.body.servings),
     mealType:JSON.parse(req.body.mealType),
@@ -285,6 +287,35 @@ async function deleteRecipeController(req,res){
 
 
 
+/** get user all created recipes, controller */
+async function getUserAllRecipe(req,res){   
+  
+  try {
+
+    const userId = req.user.id;
+
+    const recipes = await recipeModel.find({author:userId})
+
+    res.status(200).json({
+      success:true,
+      message:"all recipe fetch successfully",
+     data:  recipes
+    })
+    
+  } catch (error) {
+    return res.status(500).json({
+      success:false,
+      message:"INTERNAL SERVER ERROR",
+      error:{
+        code:"INTERNAL SERVER ERROR",
+        details:null
+      }
+    })
+  }
+
+}
+
+
 
 
 
@@ -296,6 +327,7 @@ module.exports  = {
  getSingleRecipeController,
   getAllRecipesController,
   updateRecipeController,
-  deleteRecipeController
+  deleteRecipeController,
+  getUserAllRecipe
 
 }

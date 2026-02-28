@@ -36,3 +36,18 @@ export async function getSingleRecipe(id){
      throw error
   }
 }
+
+
+
+
+export async function createRecipe(data){
+  try {
+
+    const response = await instance.post("/api/recipes" ,data)
+    return response.data
+    
+  } catch (error) {
+    console.log(error.message);
+    throw error
+  }
+}

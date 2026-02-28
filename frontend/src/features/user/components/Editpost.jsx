@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { useParams , useNavigate } from "react-router-dom";
+import { useForm, useFieldArray  } from "react-hook-form";
 import { toast } from "react-toastify";
-import useRecipe from "../hooks/useRecipe";
+import useUser from "../hooks/useUser";
 import Loading from "../../shared/Loading";
-
 
 
 const categories = [
@@ -12,9 +12,14 @@ const categories = [
 ];
 const toId = (cat) => cat.toLowerCase().replace(" ", "-");
 
-const CreateRecipe = () => {
+const Editpost = () => {
+  const navigate = useNavigate()
+  const { id } = useParams();
+  const { loading, singleRecipe, HandlegetSingleRecipe , handleUpdateUserRecipe } = useUser();
 
-  const { handleCreateRecipe} = useRecipe()
+  const [singleIngredient, setSingleIngredient] = useState("");
+  const [singleInstruction, setSingleInstruction] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const {
     register,
@@ -37,107 +42,107 @@ const CreateRecipe = () => {
     },
   });
 
-  // ── Field Arrays ─────────────────────────────────────────────
   const {
     fields: ingredientFields,
     append: appendIngredient,
     remove: removeIngredient,
-  } = useFieldArray({
-    control,
-    name: "ingredients",
-    rules: {
-      validate: (val) =>
-        val.length >= 1 || "Please provide at least 1 ingredient",
-    },
-  });
+  } = useFieldArray({ control, name: "ingredients" });
 
   const {
     fields: instructionFields,
     append: appendInstruction,
     remove: removeInstruction,
-  } = useFieldArray({
-    control,
-    name: "instructions",
-    rules: {
-      validate: (val) =>
-        val.length >= 1 || "Please provide at least 1 instruction",
-    },
-  });
+  } = useFieldArray({ control, name: "instructions" });
 
-  const [singleIngredient, setSingleIngredient] = useState("");
-  const [singleInstruction, setSingleInstruction] = useState("");
+  // ── Fetch recipe on mount ────────────────────────────────────
+  useEffect(() => {
+    HandlegetSingleRecipe(id);
+  }, [id]);
 
-  // Watch image for live preview
+  // ── Prefill form once singleRecipe loads ─────────────────────
+  useEffect(() => {
+    if (!singleRecipe) return;
+
+    reset({
+      name: singleRecipe.name || "",
+      servings: singleRecipe.servings || "",
+      preptime: singleRecipe.prepTimeMinutes || "",
+      cooktime: singleRecipe.cookTimeMinutes || "",
+      description: singleRecipe.description || "",
+      image: null, // file input can't be prefilled
+      category: singleRecipe.mealType || [],
+      ingredients: (singleRecipe.ingredients || []).map((val) => ({ value: val })),
+      instructions: (singleRecipe.instructions || []).map((val) => ({ value: val })),
+    });
+
+    // Show existing image as preview
+    if (singleRecipe.image) {
+      setPreviewUrl(singleRecipe.image);
+    }
+  }, [singleRecipe]);
+
+  // Watch new image upload for live preview
   const watchedImage = watch("image");
-  const previewUrl =
-    watchedImage && watchedImage[0]
-      ? URL.createObjectURL(watchedImage[0])
-      : null;
+  useEffect(() => {
+    if (watchedImage && watchedImage[0]) {
+      setPreviewUrl(URL.createObjectURL(watchedImage[0]));
+    }
+  }, [watchedImage]);
 
   // ── Handlers ─────────────────────────────────────────────────
   function addIngredient() {
-    if (singleIngredient.trim().length >= 3) {
+    if (singleIngredient.trim().length >= 2) {
       appendIngredient({ value: singleIngredient.trim() });
       setSingleIngredient("");
     }
   }
 
   function addInstruction() {
-    if (singleInstruction.trim().length >= 3) {
+    if (singleInstruction.trim().length >= 2) {
       appendInstruction({ value: singleInstruction.trim() });
       setSingleInstruction("");
     }
   }
 
+  async function submitHandler(data) {
+    const formData = new FormData();
 
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("ingredients", JSON.stringify(data.ingredients.map((i) => i.value)));
+    formData.append("instructions", JSON.stringify(data.instructions.map((i) => i.value)));
+    formData.append("prepTimeMinutes", Number(data.preptime));
+    formData.append("cookTimeMinutes", Number(data.cooktime));
+    formData.append("servings", Number(data.servings));
+    formData.append("mealType", JSON.stringify(data.category));
 
+    // Only append new image if user selected one
+    if (data.image && data.image[0]) {
+      formData.append("image", data.image[0]);
+    }
 
- async function submitHandler(data) {
-    const payload = {
-      ...data,
-      image: data.image[0],           // actual File object
-      ingredients: data.ingredients.map((i) => i.value),
-      instructions: data.instructions.map((i) => i.value),
-    };
+    // 👇 Replace this with your actual update API call
+     await handleUpdateUserRecipe(id,formData)
+     navigate(-1)
 
-  //  console.log(payload)
-
-
-   const formData = new FormData();
-
-   formData.append("name", payload.name);
-  formData.append("description", payload.description);
-  
-
-  formData.append("ingredients", JSON.stringify(payload.ingredients));
-  formData.append("instructions", JSON.stringify(payload.instructions));
-  
- 
-  formData.append("prepTimeMinutes", Number(data.preptime));
-  formData.append("cookTimeMinutes", Number(data.cooktime));
-  formData.append("servings", Number(data.servings));
-  
-  
-  formData.append("mealType", JSON.stringify(payload.category));
-
-
-  if (data.image && data.image[0]) {
-    formData.append("image", data.image[0]);
+    toast.success("Recipe updated successfully!");
   }
 
- await handleCreateRecipe(formData)
-    
-
-    toast.success("Recipe created successfully!");
-    reset();
-    setSingleIngredient("");
-    setSingleInstruction("");
+  // ── Loading state ─────────────────────────────────────────────
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-200 flex items-center justify-center text-white">
+          <Loading/>
+      </div>
+    );
   }
 
-  // ── UI ───────────────────────────────────────────────────────
+  // ── UI ────────────────────────────────────────────────────────
   return (
-    <div className="create-recipes p-10 min-h-screen bg-[#0F162A] text-white">
-      <form 
+    <div className="create-recipes p-10 min-h-screen bg-gray-200 rounded-2xl text-gray-900">
+      <h1 className="text-2xl font-bold mb-8 text-orange-400">Edit Recipe</h1>
+
+      <form
         className="flex flex-col gap-10 w-120"
         onSubmit={handleSubmit(submitHandler)}
       >
@@ -153,9 +158,7 @@ const CreateRecipe = () => {
             type="text"
             placeholder="Recipe title goes here"
           />
-          {errors.name && (
-            <small className="text-sm text-red-500">{errors.name.message}</small>
-          )}
+          {errors.name && <small className="text-sm text-red-500">{errors.name.message}</small>}
         </div>
 
         {/* Servings */}
@@ -170,9 +173,7 @@ const CreateRecipe = () => {
             type="number"
             placeholder="Number of serving people"
           />
-          {errors.servings && (
-            <small className="text-sm text-red-500">{errors.servings.message}</small>
-          )}
+          {errors.servings && <small className="text-sm text-red-500">{errors.servings.message}</small>}
         </div>
 
         {/* Prep Time */}
@@ -187,9 +188,7 @@ const CreateRecipe = () => {
             type="number"
             placeholder="Preparation time in minutes"
           />
-          {errors.preptime && (
-            <small className="text-sm text-red-500">{errors.preptime.message}</small>
-          )}
+          {errors.preptime && <small className="text-sm text-red-500">{errors.preptime.message}</small>}
         </div>
 
         {/* Cook Time */}
@@ -204,9 +203,7 @@ const CreateRecipe = () => {
             type="number"
             placeholder="Cook time in minutes"
           />
-          {errors.cooktime && (
-            <small className="text-sm text-red-500">{errors.cooktime.message}</small>
-          )}
+          {errors.cooktime && <small className="text-sm text-red-500">{errors.cooktime.message}</small>}
         </div>
 
         {/* Description */}
@@ -221,12 +218,10 @@ const CreateRecipe = () => {
             type="text"
             placeholder="Short recipe description"
           />
-          {errors.description && (
-            <small className="text-sm text-red-500">{errors.description.message}</small>
-          )}
+          {errors.description && <small className="text-sm text-red-500">{errors.description.message}</small>}
         </div>
 
-        {/* ── Image Upload ───────────────────────────────────────── */}
+        {/* Image Upload */}
         <div className="flex flex-col gap-2">
           <label
             htmlFor="image-upload"
@@ -238,13 +233,11 @@ const CreateRecipe = () => {
           >
             {previewUrl ? (
               <>
-                {/* Live preview */}
                 <img
                   src={previewUrl}
                   alt="Recipe preview"
                   className="w-full h-full object-cover rounded-xl"
                 />
-                {/* Hover overlay to change image */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded-xl flex flex-col items-center justify-center gap-1">
                   <i className="ri-image-edit-line text-3xl text-white" />
                   <span className="text-sm text-white font-medium">Change Image</span>
@@ -258,17 +251,13 @@ const CreateRecipe = () => {
               </div>
             )}
 
-            {/* Hidden actual file input */}
             <input
               {...register("image", {
-                required: "Recipe image is required",
                 validate: {
                   fileSize: (files) =>
-                    !files[0] ||
-                    files[0].size <= 5 * 1024 * 1024 ||
-                    "Image must be under 5MB",
+                    !files?.[0] || files[0].size <= 5 * 1024 * 1024 || "Image must be under 5MB",
                   fileType: (files) =>
-                    !files[0] ||
+                    !files?.[0] ||
                     ["image/jpeg", "image/png", "image/webp"].includes(files[0].type) ||
                     "Only JPG, PNG, WEBP files allowed",
                 },
@@ -279,10 +268,7 @@ const CreateRecipe = () => {
               className="hidden"
             />
           </label>
-
-          {errors.image && (
-            <small className="text-sm text-red-500">{errors.image.message}</small>
-          )}
+          {errors.image && <small className="text-sm text-red-500">{errors.image.message}</small>}
         </div>
 
         {/* Ingredients */}
@@ -291,9 +277,7 @@ const CreateRecipe = () => {
             <input
               value={singleIngredient}
               onChange={(e) => setSingleIngredient(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === "Enter" && (e.preventDefault(), addIngredient())
-              }
+              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addIngredient())}
               className="grow border-b border-white outline-0 py-3 px-2 bg-transparent"
               type="text"
               placeholder="Add an ingredient"
@@ -307,12 +291,6 @@ const CreateRecipe = () => {
             </button>
           </div>
 
-          {errors.ingredients?.root && (
-            <small className="text-sm text-red-500">
-              {errors.ingredients.root.message}
-            </small>
-          )}
-
           <div className="mt-1 flex flex-wrap gap-3">
             {ingredientFields.map((field, index) => (
               <div
@@ -320,10 +298,7 @@ const CreateRecipe = () => {
                 className="px-3 py-2 rounded-md bg-white text-gray-900 font-normal text-sm flex gap-2 max-w-50"
               >
                 {field.value}
-                <i
-                  className="ri-close-line cursor-pointer font-normal"
-                  onClick={() => removeIngredient(index)}
-                />
+                <i className="ri-close-line cursor-pointer font-normal" onClick={() => removeIngredient(index)} />
               </div>
             ))}
           </div>
@@ -335,9 +310,7 @@ const CreateRecipe = () => {
             <input
               value={singleInstruction}
               onChange={(e) => setSingleInstruction(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === "Enter" && (e.preventDefault(), addInstruction())
-              }
+              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addInstruction())}
               className="grow border-b border-white outline-0 py-3 px-2 bg-transparent"
               type="text"
               placeholder="Add an instruction step"
@@ -351,12 +324,6 @@ const CreateRecipe = () => {
             </button>
           </div>
 
-          {errors.instructions?.root && (
-            <small className="text-sm text-red-500">
-              {errors.instructions.root.message}
-            </small>
-          )}
-
           <div className="mt-1 w-full flex flex-col gap-3">
             {instructionFields.map((field, index) => (
               <div
@@ -367,10 +334,7 @@ const CreateRecipe = () => {
                   <span className="font-semibold mr-2">{index + 1}.</span>
                   {field.value}
                 </span>
-                <i
-                  className="ri-close-line cursor-pointer font-normal"
-                  onClick={() => removeInstruction(index)}
-                />
+                <i className="ri-close-line cursor-pointer font-normal" onClick={() => removeInstruction(index)} />
               </div>
             ))}
           </div>
@@ -393,30 +357,25 @@ const CreateRecipe = () => {
                     type="checkbox"
                     id={toId(cat)}
                   />
-                  <label
-                    className="cursor-pointer hover:text-orange-400"
-                    htmlFor={toId(cat)}
-                  >
+                  <label className="cursor-pointer hover:text-orange-400" htmlFor={toId(cat)}>
                     {cat}
                   </label>
                 </div>
               ))}
             </div>
           </div>
-          {errors.category && (
-            <small className="text-sm text-red-500">{errors.category.message}</small>
-          )}
+          {errors.category && <small className="text-sm text-red-500">{errors.category.message}</small>}
         </div>
 
         <button
           type="submit"
-          className="px-3 py-2 bg-gray-700 rounded-md cursor-pointer w-fit mt-15"
+          className="px-3 py-2 bg-orange-500 hover:bg-orange-600 transition-colors rounded-md cursor-pointer w-fit mt-15 font-semibold"
         >
-          Create Recipe
+          Update Recipe
         </button>
       </form>
     </div>
   );
 };
 
-export default CreateRecipe;
+export default Editpost;

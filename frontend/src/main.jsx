@@ -6,11 +6,14 @@ import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import AuthContext  from "./features/auth/auth.context.jsx";
 import RecipeContext from "./features/recipe/Recipe.context.jsx";
+import UserContext from "./features/user/user.context.jsx";
 
 
 
 
 createRoot(document.getElementById("root")).render(
+
+<UserContext>
 <RecipeContext>
   <AuthContext>
     <BrowserRouter>
@@ -19,4 +22,5 @@ createRoot(document.getElementById("root")).render(
     </BrowserRouter>
   </AuthContext>
 </RecipeContext>
+</UserContext>
 );

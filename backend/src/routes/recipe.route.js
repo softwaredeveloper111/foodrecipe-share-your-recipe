@@ -6,7 +6,8 @@ const {
   getSingleRecipeController,
    getAllRecipesController,
    updateRecipeController,
-   deleteRecipeController
+   deleteRecipeController,
+   getUserAllRecipe
 } = require("../controllers/recipe.controller")
 
 
@@ -44,6 +45,17 @@ recipeRouter.post("/", identifyingUser  , upload.single("image") ,createRecipeCo
 recipeRouter.get("/", identifyingUser  , getAllRecipesController)
 
 
+
+
+
+
+
+/**
+ * @method      GET
+ * @route       /api/recipes
+ * @description   user can get all her recipe
+ */
+recipeRouter.get("/user", identifyingUser  , getUserAllRecipe)
 
 
 

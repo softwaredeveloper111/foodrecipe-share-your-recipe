@@ -63,12 +63,14 @@ async function updateProfileController(req,res){
  
   try {
 
+    console.log(req.body)
     const userId = req.user.id
-   
+    
     const updatedData = {}
 
   
     if(req.body?.bio) updatedData.bio = req.body.bio
+    
     
     const result =  await userModel.findByIdAndUpdate(userId , updatedData ,{new:true})
 

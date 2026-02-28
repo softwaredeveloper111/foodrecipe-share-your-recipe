@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react'
-import { getAllRecipe , getSingleRecipe } from "./services/recipe.api";
+import { getAllRecipe , getSingleRecipe, createRecipe } from "./services/recipe.api";
 
 
 export const  recipeContextProvider = createContext();
@@ -58,11 +58,29 @@ const RecipeContext = ({children}) => {
   }
 
 
+  async function handleCreateRecipe(data){
+    setLoading(true)
+    try {
+
+      await createRecipe(data)
+      return {success:true}
+      
+    } catch (error) {
+      return {
+        success:false,
+        message:`${error.message} ,data cound not send`
+      }
+    }
+    finally{
+       setLoading(false)
+    }
+  }
+
 
 
 
   return (
-    <recipeContextProvider.Provider value={{loading,recipeData,getAllRecipeData, singleRecipeData ,getSingleRecipeData}}>
+    <recipeContextProvider.Provider value={{loading,recipeData,getAllRecipeData, singleRecipeData ,getSingleRecipeData , handleCreateRecipe}}>
 
      {children}
 

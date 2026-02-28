@@ -20,6 +20,7 @@ const  AuthContext = ({children}) => {
     setLoading(true);
     try {
       const response = await register(data);
+      console.log(response)
       setUser(response.data);
       return {success:true};
     } catch (error) {
